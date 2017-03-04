@@ -1,0 +1,28 @@
+#!/usr/local/bin/python
+import os
+import subprocess
+import time
+
+print "Checking for power outage state at %f" % time.time()
+result = subprocess.check_output("cat /home/homer/last_powout_state", shell=True)
+result2 = subprocess.check_output("ping -c 5 -i 10 130.199.47.24 | grep received", shell=True)
+
+if "> UPS_POWER_FAIL_STATE" in result.upper() or " 0 received" in result2:
+    print "power outage!"
+#    os.system("ccscmnd ts powerOutageAction")
+    if (False) :
+        os.system("ccscmnd cryo setSetPoint 2 20.")
+    	os.system("ccscmnd ccs-rebps setNamedPowerOn 0 master False")
+    	os.system("ccscmnd ccs-rebps setNamedPowerOn 1 master False")
+    	os.system("ccscmnd ccs-rebps setNamedPowerOn 2 master False")
+    	os.system("ccscmnd ccs-rebps setNamedPowerOn 1 master True")
+    	os.system("ccscmnd ccs-rebps setNamedPowerOn 1 analog True")
+    	os.system("ccscmnd ccs-rebps setNamedPowerOn 1 digital True")
+
+#for addr in hneal@bnl.gov homerneal@yahoo.fr poc@bnl.gov anomerotski@bnl.gov 2034356858@tmomail.net 6312354433@vtext.com 6318060151@vtext.com 6314887454@tmomail.net 6315149043@vtext.com; do
+#for addr in hneal@bnl.gov homerneal@yahoo.fr 2034356858@tmomail.net; do
+#for addr in 2034356858@tmomail.net; do
+
+    os.system('ssh ccdtest@astroracf mail -s "ALARM - power outage" homerneal@yahoo.fr')
+    os.system('ssh ccdtest@astroracf mail -s "ALARM - power outage" hneal@bnl.gov')
+

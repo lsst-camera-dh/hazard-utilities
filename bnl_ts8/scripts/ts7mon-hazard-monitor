@@ -1,0 +1,21 @@
+#[jh]$ tail -2 /home/ts8prod/utilities/BNL2/ts7mon.log | awk '{if (NF>17) {"date -d @"$3 | getline aa;print aa,$0}}' 
+#Fri Mar  3 10:30:04 EST 2017 time = 1488555004 , vac =   1.040e-07 Torr, ctempa =   -38.93 C, ctempb =   -60.00 C, ctempc =  -126.67 C, ctempd =  -999.00 C, htr1 =   22.4 %, htr2 =    0.0 %, PID_P1 = 12.391570, PID_I1 = 440.591700 , PID_D1 = 62.941670, PID_P2 = 2.457210, PID_I2 = 218.289800 , PID_D2 = 31.184260, reb0temp2 =    -5.31 C, reb0temp7 =   -14.75 C, reb1temp2 =    -4.75 C, reb1temp7 =   -14.00 C, reb2temp2 =    -9.25 C, reb2temp7 =   -19.06 C, ccd0temp1 =  -102.65 C, ccd1temp1 =  -105.55 C, ccd2temp1 =  -104.70 C
+
+tail -2 /home/ts8prod/utilities/BNL2/ts7mon.log | awk '{if (NF>17) {"date -d @"$3 | getline aa;print aa,$0}}' | awk '{if (NR==2) {period = ($9-otime)/60.0; deltaP = $13 - oP;rateP = deltaP/period;print "time = "$9" | pressure = "$13" Torr | period = "period" min | pressure change = "deltaP" Torr | rate of P change = "rateP" Torr/min"};otime=$9;oP=$13}' | tee -a /home/ts8prod/utilities/BNL2/ts7pressmon.log 
+
+for addr in hneal@bnl.gov homerneal@yahoo.fr poc@bnl.gov anomerotski@bnl.gov 2034356858@tmomail.net 6312354433@vtext.com 6318060151@vtext.com 6314887454@tmomail.net 6315149043@vtext.com; do
+#for addr in hneal@bnl.gov homerneal@yahoo.fr 2034356858@tmomail.net; do
+#for addr in 2034356858@tmomail.net; do
+export addr=$addr
+echo "addr="$addr
+tail -1 /home/ts8prod/utilities/BNL2/ts7pressmon.log | awk '{if ($(NF-1) > 1.E-6 && ($7 > 0. && $18<770. &&  $18>-770.)) {print "dispatching ALARM - "$0; "echo \""$0"\" | ssh ccdtest@astroracf mail -s \"\\\"ALARM - ts7-2 pressure rate change too HIGH\"\\\" $addr" | getline aa}}'
+
+tail -1 /home/ts8prod/utilities/BNL2/ts7pressmon.log | awk '{if ($7 > 1.5E-3) {print "dispatching ALARM - "$0; "echo \""$0"\" | ssh ccdtest@astroracf mail -s \"\\\"ALARM - ts7-2 pressure too HIGH\"\\\" $addr" | getline aa}}'
+
+tail -1 /home/ts8prod/utilities/BNL2/ts7mon.log | awk '{if (NF>17) {"date -d @"$3 | getline aa;print aa,$0}}' | awk '{if ($17 > -0.) {print "dispatching ALARM - "$0; "echo \""$0"\" | ssh ccdtest@astroracf mail -s \"\\\"ALARM - ts7-2 cold plate temp A too HIGH\"\\\" $addr" | getline aa}}'
+
+tail -1 /home/ts8prod/utilities/BNL2/ts7mon.log | awk '{if (NF>21) {"date -d @"$3 | getline aa;print aa,$0}}' | awk '{if ($21 > -30.) {print "dispatching ALARM - "$0; "echo \""$0"\" | ssh ccdtest@astroracf mail -s \"\\\"ALARM - ts7-2 cold plate temp B too HIGH\"\\\" $addr" | getline aa}}'
+
+tail -2 /home/ts8prod/utilities/BNL2/ts7mon.log | awk '{if (NF>17) {"date -d @"$3 | getline aa;print aa,$0}}' | awk '{reb02t=substr($0,index($0,"reb0temp2")+12,8)*1;reb07t=substr($0,index($0,"reb0temp7")+12,8)*1;reb12t=substr($0,index($0,"reb1temp2")+12,8)*1;reb17t=substr($0,index($0,"reb1temp7")+12,8)*1;reb22t=substr($0,index($0,"reb2temp2")+12,8)*1;reb27t=substr($0,index($0,"reb2temp7")+12,8)*1;if (reb02t>50. || reb12t>50. || reb22t>50. || reb07t<-45. || reb17t<-45. || reb27t<-45) {print "dispatching ALARM - "$0; "echo \""$0"\" | ssh ccdtest@astroracf mail -s \"\\\"ALARM - REB temperature too high or too low\"\\\" $addr" | getline aa}}'
+
+done

@@ -1,0 +1,2 @@
+cd $CCS_BIN_DIR
+./checktsappswidget

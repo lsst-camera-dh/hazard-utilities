@@ -1,0 +1,1 @@
+tail -2 /home/ts8prod/utilities/BNL2/ts7mon.log | awk '{if (NF>17) {"date -d @"$3 | getline aa;print aa,$0}}' | sed 's/,/\n/g' |mail -s "ts7-2 monitoring auto update" hneal@bnl.gov,mrumore@bnl.gov,astrostubbs@gmail.com,bwahl@bnl.gov,walshb@bnl.gov,jhaupt@bnl.gov,dellapenna@bnl.gov,anomerotski@bnl.gov

@@ -1,0 +1,6 @@
+#1,16,31,46 * * * * /home/homer/readnbrec
+#0-59/2 * * * * /home/homer/checkpowout
+0-59/2 * * * * /home/ts8prod/ts7mon-stat-snap.sh
+1-59/2 * * * * /home/ts8prod/ts7mon-pressure-change-monitor
+1-59/20 * * * * /home/ts8prod/ts7mon-to-astro.sh
+2-59/20 * * * * /home/ts8prod/ts7mon-auto-mail
